@@ -10,16 +10,21 @@ using System.Windows.Forms;
 
 namespace MyTransportApp
 {
-    public partial class Form1 : Form
+    public partial class InputMailAddress : Form
     {
-        public Form1()
+        public InputMailAddress()
         {
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void InputMailAddress_Load(object sender, EventArgs e)
         {
-            button.
+
+        }
+
+        private void btnSendMail_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

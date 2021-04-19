@@ -22,7 +22,13 @@
             }
 
             var uri = new Uri($"{WebApiHost}locations?query={query}");
-            return HttpClient.GetObject(uri, JsonConvert.DeserializeObject<Stations>);
+            var returnString = HttpClient.GetString(uri);
+            if (returnString == null)
+                return null;
+            return JsonConvert.DeserializeObject<Stations>(returnString, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
         }
 
         public StationBoardRoot GetStationBoard(string station, string id)
@@ -36,12 +42,38 @@
             {
                 throw new ArgumentNullException(nameof(id));
             }
-
             var uri = new Uri($"{WebApiHost}stationboard?station={station}&id={id}");
-            return HttpClient.GetObject(uri, JsonConvert.DeserializeObject<StationBoardRoot>);
+            var returnString = HttpClient.GetString(uri);
+            if (returnString == null)
+                return null;
+            return JsonConvert.DeserializeObject<StationBoardRoot>(returnString, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
         }
 
-        public Connections GetConnections(string fromStation, string toStation)
+        public Stations GetStationsByCoords(double x, double y)
+        {
+            if (x == 0)
+            {
+                throw new ArgumentNullException(nameof(x));
+            }
+
+            if (y == 0)
+            {
+                throw new ArgumentNullException(nameof(y));
+            }
+            var uri = new Uri($"{WebApiHost}locations?x={x.ToString("0.0000000", System.Globalization.CultureInfo.InvariantCulture)}&y={y.ToString("0.0000000", System.Globalization.CultureInfo.InvariantCulture)}");
+            var returnString = HttpClient.GetString(uri);
+            if (returnString == null)
+                return null;
+            return JsonConvert.DeserializeObject<Stations>(returnString, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+        }
+
+        public Connections GetConnections(string fromStation, string toStation, DateTime dateTime)
         {
             if (string.IsNullOrEmpty(fromStation))
             {
@@ -53,8 +85,20 @@
                 throw new ArgumentNullException(nameof(toStation));
             }
 
-            var uri = new Uri($"{WebApiHost}connections?from={fromStation}&to={toStation}");
-            return HttpClient.GetObject(uri, JsonConvert.DeserializeObject<Connections>);
+            if (dateTime == null)
+            {
+                throw new ArgumentNullException(nameof(dateTime));
+            }
+            string date = System.Uri.EscapeDataString(dateTime.Year.ToString() + "-" + dateTime.Month.ToString() + "-" + dateTime.Day.ToString());
+            string time = System.Uri.EscapeDataString(dateTime.Hour.ToString() + ":" + dateTime.Minute.ToString());
+            var uri = new Uri($"{WebApiHost}connections?from={fromStation}&to={toStation}&date={date}&time={time}&isArrivalTime=0");
+            var returnString = HttpClient.GetString(uri);
+            if (returnString == null)
+                return null;
+            return JsonConvert.DeserializeObject<Connections>(returnString, new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
         }
 
         public void Dispose()

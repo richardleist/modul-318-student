@@ -43,7 +43,6 @@
             {
                 throw new ArgumentNullException(nameof(uri));
             }
-
             return converter.Invoke(GetString(uri));
         }
     }
